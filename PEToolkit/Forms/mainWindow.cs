@@ -49,9 +49,10 @@ namespace PEViewer.Forms
                         i.SubItems.Add(string.Format("0x{0:x2}", offset));
                     else
                         i.SubItems.Add("");
-                    i.SubItems.Add(value.Length.ToString());
+                    i.SubItems.Add((value.Length * Marshal.SizeOf(typeof(char))).ToString());
                     i.SubItems.Add("String");
                     offset += value.Length;
+                    lvInfo.Items.Add(i);
                     continue;
                 }
                 int fieldSize = 0;
@@ -66,8 +67,10 @@ namespace PEViewer.Forms
                     i = new ListViewItem(f.Name);
                     fieldSize = Marshal.SizeOf(f.FieldType);
                 }
-                
-                i.SubItems.Add(string.Format("0x{0:x2}", f.GetValue(sInfo)));
+                if(f.FieldType.IsArray)
+                    i.SubItems.Add(string.Format("{0}[{1}]", f.FieldType.GetElementType().Name, ((Array)f.GetValue(sInfo)).Length));
+                else
+                    i.SubItems.Add(string.Format("0x{0:x2}", f.GetValue(sInfo)));
                 if (displayOffsets)
                     i.SubItems.Add(string.Format("0x{0:x2}", offset));
                 else
@@ -231,6 +234,11 @@ namespace PEViewer.Forms
         private void clearPEHeaderAntidumpToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AntiDump.Apply();
+        }
+
+        private void toolStripDropDownButton3_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
