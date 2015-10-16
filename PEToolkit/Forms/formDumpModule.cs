@@ -29,19 +29,7 @@ namespace PEViewer.Forms
                 MessageBox.Show("Select a dump location.");
                 return;
             }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            string path = string.Empty;
-            using (SaveFileDialog sfd = new SaveFileDialog())
-            {
-                sfd.Filter = "Executable|*.exe|Library|*.dll";
-                if (sfd.ShowDialog() != DialogResult.OK)
-                    return;
-                path = sfd.FileName;
-            }
-
+            string path = tbDumpLocation.Text;
             int pId = 0;
             ProcessModule module = null;
             using (formLoadProcess fProc = new formLoadProcess())
@@ -59,7 +47,7 @@ namespace PEViewer.Forms
             IntPtr procHandle = procPE.GetHandle();
             ReadProcessMemory(procHandle, module.BaseAddress, buffer, Convert.ToInt32(procPE.Overview.SizeOfHeaders), 0);
 
-            foreach(IMAGE_SECTION_HEADER section  in procPE.Sections)
+            foreach (IMAGE_SECTION_HEADER section in procPE.Sections)
             {
                 if (section.SizeOfRawData == 0)
                     continue;
@@ -67,12 +55,26 @@ namespace PEViewer.Forms
                 byte[] sData = new byte[section.SizeOfRawData];
                 ReadProcessMemory(procHandle, new IntPtr(procPE.Overview.ImageBase + section.VirtualAddress), sData, sData.Length, 0);
 
-               Buffer.BlockCopy(sData, 0, buffer, Convert.ToInt32(section.PointerToRawData), sData.Length);
+                Buffer.BlockCopy(sData, 0, buffer, Convert.ToInt32(section.PointerToRawData), sData.Length);
             }
 
             File.WriteAllBytes(path, buffer);
             procPE.CloseHandle();
             MessageBox.Show("Done");
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "Executable|*.exe|Library|*.dll";
+                if (sfd.ShowDialog() != DialogResult.OK)
+                    return;
+                tbDumpLocation.Text = sfd.FileName;
+            }
+
+            
         }
 
         [DllImport("kernel32.dll")]
