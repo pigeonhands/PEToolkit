@@ -67,6 +67,21 @@ namespace PEViewer.Memory_Tools
         }
 
         /// <summary>
+        /// Injects a dll into the target process, waits for remote thread to exit and returns dll handle
+        /// </summary>
+        /// <param name="pId">Process ID of target process</param>
+        /// <param name="DllPath">Path to dll</param>
+        /// <param name="success">Success of dll injection</param>
+        /// <returns>Handle of injected dll</returns>
+        public static IntPtr Inject(int pID, string DllPath, out bool success, bool waitForHandle)
+        {
+            IntPtr Handle = OpenProcess(0x8 | 0x2 | 0x400 | 0x10 | 0x20, false, pID);
+
+            if (Handle == IntPtr.Zero) throw new ArgumentException("Invalid process id or no permission", "pID");
+            return Inject(Handle, DllPath, out success, waitForHandle);
+        }
+
+        /// <summary>
         /// Injects a dll into the target process
         /// </summary>
         /// <param name="Handle">Handle of target process</param>
@@ -110,7 +125,6 @@ namespace PEViewer.Memory_Tools
             //LoadLibraryA - ANSI string as paramiter
             //LoadLibraryW - Unicode string as paramiter
             //LoadLibrary - Use default (Unicode), but not avalible through GetProcAddress
-            //
             IntPtr hLoadLibrary = GetProcAddress(hKernel32, "LoadLibraryA");
 
             if (hLoadLibrary == IntPtr.Zero)
@@ -128,10 +142,13 @@ namespace PEViewer.Memory_Tools
             success = hThread != IntPtr.Zero;
 
             IntPtr dllHandle = IntPtr.Zero;
-
             if (waitForDllHandle && success)
             {
-                //If injection was a success, get thread exit code
+                //If injection was a success
+                //Wait for thread to exit
+                WaitForSingleObject(hThread, 0xFFFFFFFF);
+
+                //get the thread exit code
                 //In this case, it will be the return value of LoadLibrary or 259 if its still running
                 GetExitCodeThread(hThread, ref dllHandle);
             }
@@ -142,6 +159,18 @@ namespace PEViewer.Memory_Tools
             //Return the handle of the created thread
             return dllHandle;
         }
+
+        public static void UnloadDll(IntPtr handle, IntPtr module)
+        {
+            if (handle == IntPtr.Zero) throw new ArgumentNullException("Handle");
+            IntPtr hKernel32 = GetModuleHandle("kernel32.dll");
+            IntPtr hLoadLibrary = GetProcAddress(hKernel32, "FreeLibrary");
+
+            if (hLoadLibrary == IntPtr.Zero)
+                return;
+            IntPtr hThread = CreateRemoteThread(handle, 0, 0, hLoadLibrary, module, 0, 0);
+        }
+
         #region " WinApi "
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -167,6 +196,8 @@ namespace PEViewer.Memory_Tools
 
         [DllImport("kernel32.dll")]
         private static extern bool GetExitCodeThread(IntPtr handle, ref IntPtr retBuffer);
+        [DllImport("kernel32")]
+        private static extern int WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
 
         #endregion
     }

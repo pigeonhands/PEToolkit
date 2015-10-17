@@ -45,13 +45,31 @@ namespace PEViewer.Forms
             {
                 if(proc.ShowDialog() == DialogResult.OK)
                 {
-                    if (DllInjector.Inject(proc.SelectedProcessID, tbDllPath.Text))
-                        MessageBox.Show("Injected Successfully.");
+                    string message = string.Empty;
+                    bool success = false;
+
+                    IntPtr handle = DllInjector.Inject(proc.SelectedProcessID, tbDllPath.Text, out success, cbWaitForHandle.Checked);
+
+                    if(success)
+                    {
+                        message = "Injected Successfully.";
+                        if (handle != IntPtr.Zero)
+                            message += string.Format("{0}Dll Handle: 0x{1:x2}", Environment.NewLine, handle.ToInt32());
+                    }
                     else
-                        MessageBox.Show("Failed to inject.");
+                    {
+                        message = "Failed to inejct dll.";
+                    }
+
+                    MessageBox.Show(message);
                     this.DialogResult = DialogResult.OK;
                 }
             }
+        }
+
+        private void formInjectDll_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

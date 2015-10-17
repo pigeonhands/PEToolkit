@@ -128,6 +128,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MinimumSize = new System.Drawing.Size(300, 300);
             this.Name = "formGenerateStructure";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Generate Structures";
             this.Load += new System.EventHandler(this.formGenerateStructure_Load);
             this.ResumeLayout(false);

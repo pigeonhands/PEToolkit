@@ -69,6 +69,7 @@
             this.Controls.Add(this.lvResources);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "formNativeresources";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Resources";
             this.Load += new System.EventHandler(this.formNativeresources_Load);
             this.ResumeLayout(false);

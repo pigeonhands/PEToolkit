@@ -1,6 +1,8 @@
-﻿using PEViewer.PE.Structures;
+﻿using PEToolkit.PE.Structures;
+using PEViewer.PE.Structures;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -14,13 +16,12 @@ namespace PEViewer.PE
 
         public string PESource { get; set; }
         public bool IsProcess { get; private set;}
-        public IntPtr ModuleBaseAddress { get { return SelectedModule.BaseAddress; } }
+        public IntPtr ModuleBaseAddress { get; private set; }
 
         private int ProcessID;
         private string FilePath;
         IntPtr Handle = IntPtr.Zero;
-        IntPtr ModuleHandle = IntPtr.Zero;
-        private ProcessModule SelectedModule;
+        IntPtr loadedModuleHandle = IntPtr.Zero;
 
         public IMAGE_DOS_HEADER DosHeader;
         public IMAGE_FILE_HEADER FileHeader;
@@ -28,6 +29,7 @@ namespace PEViewer.PE
         public IMAGE_DATA_DIRECTORIES DataDirectories;
         public IMAGE_SECTION_HEADER[] Sections;
         public IMAGE_OVERVIEW Overview;
+        //public MODULE_INFO ModuleInfo;
 
         public const int SizeOfDosHeader = 0x40;
         public const int SizeOfFileHeader = 0x18;
@@ -51,14 +53,39 @@ namespace PEViewer.PE
             IsProcess = false;
         }
 
-        public PEInfomation(int pId, ProcessModule _module)
+        public PEInfomation(int pId, IntPtr _module)
         {
             ProcessID = pId;
-            SelectedModule = _module;
+            ModuleBaseAddress = _module;
+            LoadModuleInfo();
+        }
+
+        public PEInfomation(IntPtr procHandle, IntPtr _module)
+        {
+            Handle = procHandle;
+            ProcessID = 0;
+            ModuleBaseAddress = _module;
+            LoadModuleInfo();
+        }
+
+        void LoadModuleInfo()
+        {
+            StringBuilder sb = new StringBuilder(255);
+            GetModuleFileNameEx(GetProcessHandle(), ModuleBaseAddress, sb, 255);
+            FilePath = sb.ToString();
+
+            /*
+            ModuleInfo = new MODULE_INFO();
+            GetModuleInformation(GetProcessHandle(), ModuleBaseAddress, out ModuleInfo, Marshal.SizeOf(typeof(MODULE_INFO)));
+            Debug.WriteLine(new Win32Exception(Marshal.GetLastWin32Error()).Message);
+            */
+
+            CloseProcessHandle();
+
             IsProcess = true;
         }
 
-        public IntPtr GetHandle()
+        public IntPtr GetProcessHandle()
         {
             if (Handle != IntPtr.Zero)
                 return Handle;
@@ -67,29 +94,7 @@ namespace PEViewer.PE
             return Handle;
         }
 
-        public IntPtr LoadModule()
-        {
-            if (ModuleHandle != IntPtr.Zero)
-                return ModuleHandle;
-
-            if(IsProcess)
-                ModuleHandle = LoadLibrary(SelectedModule.FileName);
-            else
-                ModuleHandle = LoadLibrary(FilePath);
-
-            return ModuleHandle;
-        }
-
-        public void UnloadModule()
-        {
-            if (ModuleHandle == IntPtr.Zero)
-                return;
-
-            if (FreeLibrary(ModuleHandle))
-                ModuleHandle = IntPtr.Zero;
-        }
-
-        public void CloseHandle()
+        public void CloseProcessHandle()
         {
             if (Handle == IntPtr.Zero)
                 return;
@@ -101,6 +106,28 @@ namespace PEViewer.PE
             }
         }
 
+        public IntPtr LoadModule()
+        {
+            if (loadedModuleHandle != IntPtr.Zero)
+                return loadedModuleHandle;
+
+            loadedModuleHandle = LoadLibrary(FilePath);
+
+
+            return loadedModuleHandle;
+        }
+
+        public void UnloadModule()
+        {
+            if (loadedModuleHandle == IntPtr.Zero)
+                return;
+
+            if (FreeLibrary(loadedModuleHandle))
+                loadedModuleHandle = IntPtr.Zero;
+        }
+
+
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
         [DllImport("kernel32.dll")]
@@ -109,5 +136,11 @@ namespace PEViewer.PE
         private static extern IntPtr LoadLibrary(string path);
         [DllImport("kernel32.dll")]
         private static extern bool FreeLibrary(IntPtr handle);
+        [DllImport("psapi.dll")]
+        private static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, StringBuilder lpBaseName, int nSize);
+        [DllImport("psapi.dll", SetLastError =true)]
+        private static extern bool GetModuleInformation(IntPtr handle, IntPtr module, out MODULE_INFO inf, int cb);
+        [DllImport("kernel32.dll")]
+        private static extern bool GetModuleHandleEx(uint flags, StringBuilder address, out IntPtr handle);
     }
 }

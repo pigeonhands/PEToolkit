@@ -49,12 +49,27 @@ namespace PEViewer.PE
 
         public static PEInfomation Load(int ProcessID, ProcessModule module)
         {
-            PEInfomation info = new PEInfomation(ProcessID, module);
-            IntPtr handle = info.GetHandle();
+            return Load(ProcessID, module.BaseAddress);
+        }
+
+
+        public static PEInfomation Load(int ProcessID, IntPtr moduleAddress)
+        {
+            PEInfomation info = new PEInfomation(ProcessID, moduleAddress);
+            return vLoad(info, moduleAddress);
+        }
+
+        public static PEInfomation Load(IntPtr procHandle, IntPtr moduleAddress)
+        {
+            PEInfomation info = new PEInfomation(procHandle, moduleAddress);
+            return vLoad(info, moduleAddress);
+        }
+
+        private static PEInfomation vLoad(PEInfomation info, IntPtr baseAddress)
+        {
+            IntPtr handle = info.GetProcessHandle();
             if (handle == IntPtr.Zero)
                 throw new ArgumentException("Invalid process", "ProcessID");
-
-            IntPtr baseAddress = module.BaseAddress;
 
             info.DosHeader = StructFromMemory<IMAGE_DOS_HEADER>(handle, baseAddress);
             IntPtr imageBase = new IntPtr(info.DosHeader.e_lfanew + (uint)baseAddress);
@@ -72,16 +87,28 @@ namespace PEViewer.PE
                 info.Sections[i] = StructFromMemory<IMAGE_SECTION_HEADER>(handle, sectionLocation);
             }
 
-            info.CloseHandle();
+            info.CloseProcessHandle();
 
             info.WriteOverview();
             return info;
         }
 
+        
         public static PEInfomation DisectSelf()
         {
             Process p = Process.GetCurrentProcess();
             return Load(p.Id, p.Modules[0]);
+        }
+
+        public static IntPtr OpenProcessHandle(int pid)
+        {
+            return OpenProcess(0x1F0FFF, false, pid);
+        }
+
+        public static void CloseProcessHandle(IntPtr handle)
+        {
+            if (handle != IntPtr.Zero)
+                CloseHandle(handle);
         }
 
         private static T StructFromMemory<T>(IntPtr handle, IntPtr address)
@@ -102,8 +129,11 @@ namespace PEViewer.PE
             return retStruct;
         }
 
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr OpenProcess(uint access, bool inherit, int id);
+        [DllImport("kernel32.dll")]
+        private static extern bool CloseHandle(IntPtr handle);
         [DllImport("kernel32.dll")]
         private static extern bool ReadProcessMemory(IntPtr process, IntPtr baseAddress, byte[] buffer, int bufferSize, int bytesRead);
     }

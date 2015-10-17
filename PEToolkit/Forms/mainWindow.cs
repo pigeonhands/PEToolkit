@@ -1,4 +1,5 @@
-﻿using PEToolkit.Memory_Tools;
+﻿using PEToolkit.Forms;
+using PEToolkit.Memory_Tools;
 using PEViewer.Controls;
 using PEViewer.PE;
 using PEViewer.PE.Structures;
@@ -223,22 +224,25 @@ namespace PEViewer.Forms
             LoadedPE.UnloadModule();
         }
 
-        private void dumpModuleToolStripMenuItem_Click(object sender, EventArgs e)
+        private void unloadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (formDumpModule dm = new formDumpModule())
+            using (formLoadProcess procLoadForm = new formLoadProcess(false))
             {
-                dm.ShowDialog();
+                if (procLoadForm.ShowDialog() == DialogResult.OK)
+                {
+                    using (formModuleView dlls = new formModuleView(procLoadForm.SelectedProcessID, procLoadForm.ProcessName))
+                    {
+                        dlls.ShowDialog();
+                    }
+                }
             }
-        }
-
-        private void clearPEHeaderAntidumpToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            AntiDump.Apply();
         }
 
         private void toolStripDropDownButton3_Click(object sender, EventArgs e)
         {
 
         }
+
+        
     }
 }

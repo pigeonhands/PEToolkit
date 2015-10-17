@@ -32,6 +32,7 @@
             this.tbDllPath = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.cbWaitForHandle = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -64,7 +65,7 @@
             // button2
             // 
             this.button2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.Location = new System.Drawing.Point(108, 32);
+            this.button2.Location = new System.Drawing.Point(114, 52);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 3;
@@ -72,18 +73,32 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // cbWaitForHandle
+            // 
+            this.cbWaitForHandle.AutoSize = true;
+            this.cbWaitForHandle.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbWaitForHandle.Location = new System.Drawing.Point(15, 32);
+            this.cbWaitForHandle.Name = "cbWaitForHandle";
+            this.cbWaitForHandle.Size = new System.Drawing.Size(144, 17);
+            this.cbWaitForHandle.TabIndex = 4;
+            this.cbWaitForHandle.Text = "Wait for thread handle";
+            this.cbWaitForHandle.UseVisualStyleBackColor = true;
+            // 
             // formInjectDll
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(289, 60);
+            this.ClientSize = new System.Drawing.Size(289, 78);
+            this.Controls.Add(this.cbWaitForHandle);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tbDllPath);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "formInjectDll";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Inject Dll";
+            this.Load += new System.EventHandler(this.formInjectDll_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -95,5 +110,6 @@
         private System.Windows.Forms.TextBox tbDllPath;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.CheckBox cbWaitForHandle;
     }
 }

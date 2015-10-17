@@ -51,6 +51,7 @@
             this.Controls.Add(this.rtbStruct);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "formBuildStructure";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Structure";
             this.Load += new System.EventHandler(this.formBuildStructure_Load);
             this.ResumeLayout(false);

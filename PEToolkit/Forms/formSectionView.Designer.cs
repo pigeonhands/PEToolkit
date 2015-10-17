@@ -89,6 +89,7 @@
             this.Controls.Add(this.lvSections);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "formSectionView";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Sections";
             this.Load += new System.EventHandler(this.formSectionView_Load);
             this.ResumeLayout(false);

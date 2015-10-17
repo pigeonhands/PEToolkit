@@ -50,7 +50,6 @@
             this.toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
             this.checkForRunPEToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.injectDllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dumpModuleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.generateStructuresToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,6 +62,7 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.unloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cmOpen.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -211,7 +211,7 @@
             this.toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.checkForRunPEToolStripMenuItem,
             this.injectDllToolStripMenuItem,
-            this.dumpModuleToolStripMenuItem});
+            this.unloadToolStripMenuItem});
             this.toolStripDropDownButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton4.Image")));
             this.toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton4.Name = "toolStripDropDownButton4";
@@ -231,13 +231,6 @@
             this.injectDllToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.injectDllToolStripMenuItem.Text = "Inject Dll";
             this.injectDllToolStripMenuItem.Click += new System.EventHandler(this.injectDllToolStripMenuItem_Click);
-            // 
-            // dumpModuleToolStripMenuItem
-            // 
-            this.dumpModuleToolStripMenuItem.Name = "dumpModuleToolStripMenuItem";
-            this.dumpModuleToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
-            this.dumpModuleToolStripMenuItem.Text = "Dump Module";
-            this.dumpModuleToolStripMenuItem.Click += new System.EventHandler(this.dumpModuleToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -335,6 +328,13 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
+            // unloadToolStripMenuItem
+            // 
+            this.unloadToolStripMenuItem.Name = "unloadToolStripMenuItem";
+            this.unloadToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.unloadToolStripMenuItem.Text = "View Modules";
+            this.unloadToolStripMenuItem.Click += new System.EventHandler(this.unloadToolStripMenuItem_Click);
+            // 
             // mainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -390,6 +390,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem injectDllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resourcesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem dumpModuleToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem unloadToolStripMenuItem;
     }
 }
