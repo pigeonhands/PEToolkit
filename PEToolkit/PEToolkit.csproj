@@ -125,6 +125,7 @@
     <Compile Include="PE\Structures\IMAGE_OPTIONAL_HEADER32.cs" />
     <Compile Include="PE\Structures\IMAGE_OVERVIEW.cs" />
     <Compile Include="PE\Structures\IMAGE_SECTION_HEADER.cs" />
+    <Compile Include="PE\Structures\MEMORY_BASIC_INFORMATION.cs" />
     <Compile Include="PE\Structures\MODULE_INFO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

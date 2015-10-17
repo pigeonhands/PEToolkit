@@ -1,4 +1,5 @@
 ﻿using PEToolkit.Controls;
+using PEToolkit.PE.Structures;
 using PEViewer.Memory_Tools;
 using PEViewer.PE;
 using PEViewer.PE.Structures;
@@ -19,8 +20,10 @@ namespace PEToolkit.Forms
     public partial class formModuleView : Form
     {
         int ProcessID;
+        public PEInfomation LoadInfomation { get; private set; }
 
         public object DllInject { get; private set; }
+        List<IntPtr> FoundModules = new List<IntPtr>();
 
         public formModuleView(int pID, string name)
         {
@@ -36,7 +39,7 @@ namespace PEToolkit.Forms
 
         void PopulateList()
         {
-            lvModules.Items.Clear();
+            
             IntPtr pHandle = PELoader.OpenProcessHandle(ProcessID);
             if (pHandle == IntPtr.Zero)
             {
@@ -53,6 +56,9 @@ namespace PEToolkit.Forms
                 return;
             }
 
+            lvModules.Items.Clear();
+            FoundModules.Clear();
+
             int ModuleCount = size / Marshal.SizeOf(typeof(IntPtr));
             IntPtr[] modules = new IntPtr[ModuleCount];
 
@@ -62,6 +68,8 @@ namespace PEToolkit.Forms
                 this.DialogResult = DialogResult.OK;
                 return;
             }
+
+            FoundModules.AddRange(modules);
 
             foreach (IntPtr m in modules)
             {
@@ -133,12 +141,6 @@ namespace PEToolkit.Forms
             procPE.CloseProcessHandle();
         }
 
-        [DllImport("psapi.dll")]
-        private static extern bool EnumProcessModulesEx(IntPtr hProc, IntPtr[] lphModule, int size, out int sizeNeeded, uint flags);
-
-        [DllImport("kernel32.dll")]
-        private static extern bool ReadProcessMemory(IntPtr handle, IntPtr address, byte[] buffer, int blen, int w0);
-
         private void unloadSelectedModulesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             foreach(ListViewItem i in lvModules.SelectedItems)
@@ -155,5 +157,57 @@ namespace PEToolkit.Forms
         {
             PopulateList();
         }
+
+        private void findUnlistedImageSectorsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MEMORY_BASIC_INFORMATION memInfo = new MEMORY_BASIC_INFORMATION();
+            int mem_size = Marshal.SizeOf(memInfo);
+            uint currentAddress = 0;
+
+            IntPtr hProc = PELoader.OpenProcessHandle(ProcessID);
+            while(VirtualQueryEx(hProc, currentAddress, out memInfo, mem_size) != 0)
+            {
+                if (FoundModules.Contains(memInfo.AllocationBase))
+                {
+                    currentAddress += memInfo.RegionSize;
+                    continue;
+                }
+
+                if (memInfo.Protect == 0x1)//memInfo.Type != 0x1000000
+                {
+                    currentAddress += memInfo.RegionSize;
+                    continue;
+                }
+
+                IMAGE_DOS_HEADER header = PELoader.StructFromMemory<IMAGE_DOS_HEADER>(hProc, memInfo.AllocationBase);
+
+                if(header.e_magic[0] == 'M' && header.e_magic[1] == 'Z')
+                    lvModules.Items.Add(new ModuleListViewItem(ProcessID, memInfo.AllocationBase));
+                FoundModules.Add(memInfo.AllocationBase);
+
+                currentAddress += memInfo.RegionSize;//0x1000000
+            }
+
+            PELoader.CloseProcessHandle(hProc);
+        }
+
+        private void loadModuleIntoPEViewerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lvModules.SelectedItems.Count > 0)
+            {
+                ModuleListViewItem i = (ModuleListViewItem)lvModules.SelectedItems[0];
+                LoadInfomation = i.ModuleInfomation;
+                this.DialogResult = DialogResult.Yes;
+            }
+        }
+
+        [DllImport("psapi.dll")]
+        private static extern bool EnumProcessModulesEx(IntPtr hProc, IntPtr[] lphModule, int size, out int sizeNeeded, uint flags);
+        [DllImport("kernel32.dll")]
+        private static extern bool ReadProcessMemory(IntPtr handle, IntPtr address, byte[] buffer, int blen, int w0);
+        [DllImport("kernel32.dll")]
+        private static extern uint VirtualQueryEx(IntPtr handle, uint address, out MEMORY_BASIC_INFORMATION info, int size);
+
+        
     }
 }

@@ -111,7 +111,7 @@ namespace PEViewer.PE
                 CloseHandle(handle);
         }
 
-        private static T StructFromMemory<T>(IntPtr handle, IntPtr address)
+        public static T StructFromMemory<T>(IntPtr handle, IntPtr address)
         {
             int structSize = Marshal.SizeOf(typeof(T));
             byte[] buffer = new byte[structSize];
@@ -119,7 +119,7 @@ namespace PEViewer.PE
             return StructFromBytes<T>(buffer, 0);
         }
 
-        private static T StructFromBytes<T>(byte[] data, int offset)
+        public static T StructFromBytes<T>(byte[] data, int offset)
         {
             int structSize = Marshal.SizeOf(typeof(T));
             IntPtr gAlloc = Marshal.AllocHGlobal(structSize);

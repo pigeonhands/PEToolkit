@@ -30,8 +30,11 @@ namespace PEToolkit.Controls
 
             Text = Path.GetFileName(ModulePath);
             SubItems.Add(string.Format("0x{0:x2}", IntPtr.Size == 4 ? _handle.ToInt32() : _handle.ToInt64()));
-           SubItems.Add(ModuleInfomation.Overview.SizeOfImage.ToString());
-            SubItems.Add(ModulePath);
+            SubItems.Add(ModuleInfomation.Overview.SizeOfImage.ToString());
+            if(!string.IsNullOrEmpty(Text))
+                SubItems.Add(ModulePath);
+            else
+                SubItems.Add("Byte loaded");
         }
 
         [DllImport("psapi.dll")]

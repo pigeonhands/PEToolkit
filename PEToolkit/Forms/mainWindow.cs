@@ -232,7 +232,13 @@ namespace PEViewer.Forms
                 {
                     using (formModuleView dlls = new formModuleView(procLoadForm.SelectedProcessID, procLoadForm.ProcessName))
                     {
-                        dlls.ShowDialog();
+                        if(dlls.ShowDialog() == DialogResult.Yes)
+                        {
+                            LoadedPE = dlls.LoadInfomation;
+                            LoadedPE.PESource = string.Format("Process: {0}", procLoadForm.ProcessName);
+                            lbCurrentSection.Text = "Overview";
+                            PopulateInfo(LoadedPE.Overview, false);
+                        }
                     }
                 }
             }

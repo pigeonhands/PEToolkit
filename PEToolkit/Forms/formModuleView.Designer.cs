@@ -32,12 +32,14 @@
             this.lvModules = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.cmModules = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dumpSelectedModulesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.unloadSelectedModulesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.findUnlistedImageSectorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadModuleIntoPEViewerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cmModules.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,7 +58,7 @@
             this.lvModules.GridLines = true;
             this.lvModules.Location = new System.Drawing.Point(12, 12);
             this.lvModules.Name = "lvModules";
-            this.lvModules.Size = new System.Drawing.Size(659, 349);
+            this.lvModules.Size = new System.Drawing.Size(629, 364);
             this.lvModules.TabIndex = 1;
             this.lvModules.UseCompatibleStateImageBehavior = false;
             this.lvModules.View = System.Windows.Forms.View.Details;
@@ -71,24 +73,26 @@
             this.columnHeader2.Text = "Handle";
             this.columnHeader2.Width = 106;
             // 
-            // columnHeader4
-            // 
-            this.columnHeader4.Text = "Path";
-            this.columnHeader4.Width = 138;
-            // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "Module Size";
             this.columnHeader3.Width = 138;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "Path";
+            this.columnHeader4.Width = 138;
             // 
             // cmModules
             // 
             this.cmModules.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.refreshToolStripMenuItem,
             this.dumpSelectedModulesToolStripMenuItem,
-            this.unloadSelectedModulesToolStripMenuItem});
+            this.unloadSelectedModulesToolStripMenuItem,
+            this.findUnlistedImageSectorsToolStripMenuItem,
+            this.loadModuleIntoPEViewerToolStripMenuItem});
             this.cmModules.Name = "cmModules";
-            this.cmModules.Size = new System.Drawing.Size(209, 92);
+            this.cmModules.Size = new System.Drawing.Size(224, 136);
             // 
             // refreshToolStripMenuItem
             // 
@@ -100,7 +104,7 @@
             // dumpSelectedModulesToolStripMenuItem
             // 
             this.dumpSelectedModulesToolStripMenuItem.Name = "dumpSelectedModulesToolStripMenuItem";
-            this.dumpSelectedModulesToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+            this.dumpSelectedModulesToolStripMenuItem.Size = new System.Drawing.Size(208, 22);
             this.dumpSelectedModulesToolStripMenuItem.Text = "Dump Selected Modules";
             this.dumpSelectedModulesToolStripMenuItem.Click += new System.EventHandler(this.dumpSelectedModulesToolStripMenuItem_Click);
             // 
@@ -111,13 +115,27 @@
             this.unloadSelectedModulesToolStripMenuItem.Text = "Unload Selected Modules";
             this.unloadSelectedModulesToolStripMenuItem.Click += new System.EventHandler(this.unloadSelectedModulesToolStripMenuItem_Click);
             // 
+            // findUnlistedImageSectorsToolStripMenuItem
+            // 
+            this.findUnlistedImageSectorsToolStripMenuItem.Name = "findUnlistedImageSectorsToolStripMenuItem";
+            this.findUnlistedImageSectorsToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+            this.findUnlistedImageSectorsToolStripMenuItem.Text = "Find un-listed image sectors";
+            this.findUnlistedImageSectorsToolStripMenuItem.Click += new System.EventHandler(this.findUnlistedImageSectorsToolStripMenuItem_Click);
+            // 
+            // loadModuleIntoPEViewerToolStripMenuItem
+            // 
+            this.loadModuleIntoPEViewerToolStripMenuItem.Name = "loadModuleIntoPEViewerToolStripMenuItem";
+            this.loadModuleIntoPEViewerToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+            this.loadModuleIntoPEViewerToolStripMenuItem.Text = "Load module into PE viewer";
+            this.loadModuleIntoPEViewerToolStripMenuItem.Click += new System.EventHandler(this.loadModuleIntoPEViewerToolStripMenuItem_Click);
+            // 
             // formModuleView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(683, 373);
+            this.ClientSize = new System.Drawing.Size(653, 388);
             this.Controls.Add(this.lvModules);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "formModuleView";
             this.Text = "Modules";
             this.Load += new System.EventHandler(this.formModuleView_Load);
@@ -137,5 +155,7 @@
         private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem dumpSelectedModulesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem unloadSelectedModulesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem findUnlistedImageSectorsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadModuleIntoPEViewerToolStripMenuItem;
     }
 }
