@@ -110,7 +110,7 @@ namespace PEToolkit.Forms
                         foreach(ListViewItem i in lvModules.SelectedItems)
                         {
                             ModuleListViewItem item = (ModuleListViewItem)i;
-                            DumpModule(item.ModuleInfomation, Path.Combine(fbd.SelectedPath, Path.GetFileName(item.ModulePath)));
+                            DumpModule(item.ModuleInfomation, Path.Combine(fbd.SelectedPath, "Dump_" + Path.GetFileName(item.ModulePath)));
                         }
                         MessageBox.Show("Done.");
                     }
@@ -181,10 +181,22 @@ namespace PEToolkit.Forms
 
                 IMAGE_DOS_HEADER header = PELoader.StructFromMemory<IMAGE_DOS_HEADER>(hProc, memInfo.AllocationBase);
 
+                if (!FoundModules.Contains(memInfo.BaseAddress))
+                {
+                    byte[] buffer = new byte[memInfo.RegionSize];
+                    ReadProcessMemory(hProc, memInfo.BaseAddress, buffer, buffer.Length, 0);
+                    for (int i = 0; i < buffer.Length - 1; i++)
+                    {
+                        if (buffer[i] == 'M' && buffer[i + 1] == 'Z')
+                            lvModules.Items.Add(new ModuleListViewItem(ProcessID, memInfo.BaseAddress + i));
+                    }
+                    FoundModules.Add(memInfo.BaseAddress);
+                }
+                /*
                 if(header.e_magic[0] == 'M' && header.e_magic[1] == 'Z')
                     lvModules.Items.Add(new ModuleListViewItem(ProcessID, memInfo.AllocationBase));
                 FoundModules.Add(memInfo.AllocationBase);
-
+                */
                 currentAddress += memInfo.RegionSize;//0x1000000
             }
 

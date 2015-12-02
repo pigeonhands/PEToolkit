@@ -32,18 +32,21 @@ namespace PEViewer.Forms
 
         }
 
-        void PopulateInfo<Struct>(Struct sInfo, bool displayOffsets = true, bool useOffset = true)
+        void PopulateInfo<Struct>(Struct sInfo, bool displayOffsets = true, bool useFileHeaderOffset = true, int uoffset = 0)
         {
             lvInfo.Items.Clear();
             this.Text = string.Format("{0} ({1})", LoadedWindowTest, LoadedPE.PESource);
             Type t = sInfo.GetType();
-            int offset = useOffset ? Convert.ToInt32(LoadedPE.Overview.FileHeaderPointer) : 0;
-            foreach(FieldInfo f in t.GetFields())
+            int offset = useFileHeaderOffset ? Convert.ToInt32(LoadedPE.Overview.FileHeaderPointer) : uoffset;
+
+            foreach (FieldInfo f in t.GetFields())
             {
                 ListViewItem i;
                 if (f.FieldType == typeof(char[]))
                 {
                     char[] value = (char[])f.GetValue(sInfo);
+                    if (value == null)
+                        value = new char[0];
                     i = new ListViewItem(f.Name);
                     i.SubItems.Add(new string(value));
                     if (displayOffsets)
@@ -249,6 +252,28 @@ namespace PEViewer.Forms
 
         }
 
-        
+        private void cOR20ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (LoadedPE == null) return;
+            lbCurrentSection.Text = "COR20 Header";
+            PopulateInfo(LoadedPE.NetStructures.COR20Header, true, false, LoadedPE.NetStructures.NetOffsets.COR20RawAddress);
+        }
+
+        private void metaDataHeaderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (LoadedPE == null) return;
+            lbCurrentSection.Text = "MetaData Header";
+            PopulateInfo(LoadedPE.NetStructures.MetaDataHeader, true, false, LoadedPE.NetStructures.NetOffsets.MetaDataRawAddress);
+        }
+
+        private void dataStreamsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (LoadedPE == null)
+                return;
+            using (formStorageStreamView sec = new formStorageStreamView(LoadedPE))
+            {
+                sec.ShowDialog();
+            }
+        }
     }
 }

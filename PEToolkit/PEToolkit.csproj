@@ -109,6 +109,12 @@
     <Compile Include="Forms\formSectionView.Designer.cs">
       <DependentUpon>formSectionView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\formStorageStreamView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\formStorageStreamView.Designer.cs">
+      <DependentUpon>formStorageStreamView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\mainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,6 +123,7 @@
     </Compile>
     <Compile Include="Memory Tools\AntiDump.cs" />
     <Compile Include="Memory Tools\DllInjector.cs" />
+    <Compile Include="Memory Tools\ManualMap.cs" />
     <Compile Include="PE\PEInfomation.cs" />
     <Compile Include="PE\PELoader.cs" />
     <Compile Include="PE\Structures\IMAGE_DATA_DIRECTORIES.cs" />
@@ -126,7 +133,12 @@
     <Compile Include="PE\Structures\IMAGE_OVERVIEW.cs" />
     <Compile Include="PE\Structures\IMAGE_SECTION_HEADER.cs" />
     <Compile Include="PE\Structures\MEMORY_BASIC_INFORMATION.cs" />
+    <Compile Include="PE\Structures\MetaData\COR20_HEADER.cs" />
+    <Compile Include="PE\Structures\MetaData\METADATA_HEADER.cs" />
+    <Compile Include="PE\Structures\MetaData\STORAGE_STREAM_HEADER.cs" />
     <Compile Include="PE\Structures\MODULE_INFO.cs" />
+    <Compile Include="PE\Structures\NET_OFFSETS.cs" />
+    <Compile Include="PE\Structures\NET_STRUCTURES.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\formArrayValues.resx">
@@ -158,6 +170,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\formSectionView.resx">
       <DependentUpon>formSectionView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\formStorageStreamView.resx">
+      <DependentUpon>formStorageStreamView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\mainWindow.resx">
       <DependentUpon>mainWindow.cs</DependentUpon>

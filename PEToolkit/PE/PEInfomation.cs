@@ -1,4 +1,5 @@
 ﻿using PEToolkit.PE.Structures;
+using PEToolkit.PE.Structures.MetaData;
 using PEViewer.PE.Structures;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,9 @@ namespace PEViewer.PE
         public IMAGE_SECTION_HEADER[] Sections;
         public IMAGE_OVERVIEW Overview;
         //public MODULE_INFO ModuleInfo;
+
+        public NET_STRUCTURES NetStructures;
+        
 
         public const int SizeOfDosHeader = 0x40;
         public const int SizeOfFileHeader = 0x18;

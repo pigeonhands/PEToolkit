@@ -50,6 +50,7 @@
             this.toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
             this.checkForRunPEToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.injectDllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.unloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.generateStructuresToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,7 +63,10 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.unloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nETToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cOR20ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.metaDataHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dataStreamsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cmOpen.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -143,6 +147,7 @@
             this.imageHeaderToolStripMenuItem,
             this.optionalPEHeaderToolStripMenuItem,
             this.dataDirectoriesToolStripMenuItem,
+            this.nETToolStripMenuItem,
             this.structuresToolStripMenuItem,
             this.resourcesToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
@@ -231,6 +236,13 @@
             this.injectDllToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.injectDllToolStripMenuItem.Text = "Inject Dll";
             this.injectDllToolStripMenuItem.Click += new System.EventHandler(this.injectDllToolStripMenuItem_Click);
+            // 
+            // unloadToolStripMenuItem
+            // 
+            this.unloadToolStripMenuItem.Name = "unloadToolStripMenuItem";
+            this.unloadToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.unloadToolStripMenuItem.Text = "View Modules";
+            this.unloadToolStripMenuItem.Click += new System.EventHandler(this.unloadToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -328,12 +340,36 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // unloadToolStripMenuItem
+            // nETToolStripMenuItem
             // 
-            this.unloadToolStripMenuItem.Name = "unloadToolStripMenuItem";
-            this.unloadToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
-            this.unloadToolStripMenuItem.Text = "View Modules";
-            this.unloadToolStripMenuItem.Click += new System.EventHandler(this.unloadToolStripMenuItem_Click);
+            this.nETToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cOR20ToolStripMenuItem,
+            this.metaDataHeaderToolStripMenuItem,
+            this.dataStreamsToolStripMenuItem});
+            this.nETToolStripMenuItem.Name = "nETToolStripMenuItem";
+            this.nETToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
+            this.nETToolStripMenuItem.Text = ".NET";
+            // 
+            // cOR20ToolStripMenuItem
+            // 
+            this.cOR20ToolStripMenuItem.Name = "cOR20ToolStripMenuItem";
+            this.cOR20ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.cOR20ToolStripMenuItem.Text = "COR20";
+            this.cOR20ToolStripMenuItem.Click += new System.EventHandler(this.cOR20ToolStripMenuItem_Click);
+            // 
+            // metaDataHeaderToolStripMenuItem
+            // 
+            this.metaDataHeaderToolStripMenuItem.Name = "metaDataHeaderToolStripMenuItem";
+            this.metaDataHeaderToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.metaDataHeaderToolStripMenuItem.Text = "MetaData Header";
+            this.metaDataHeaderToolStripMenuItem.Click += new System.EventHandler(this.metaDataHeaderToolStripMenuItem_Click);
+            // 
+            // dataStreamsToolStripMenuItem
+            // 
+            this.dataStreamsToolStripMenuItem.Name = "dataStreamsToolStripMenuItem";
+            this.dataStreamsToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.dataStreamsToolStripMenuItem.Text = "Storage Streams";
+            this.dataStreamsToolStripMenuItem.Click += new System.EventHandler(this.dataStreamsToolStripMenuItem_Click);
             // 
             // mainWindow
             // 
@@ -391,5 +427,9 @@
         private System.Windows.Forms.ToolStripMenuItem injectDllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resourcesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem unloadToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nETToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem cOR20ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem metaDataHeaderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dataStreamsToolStripMenuItem;
     }
 }
