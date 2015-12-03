@@ -18,6 +18,7 @@ namespace PEViewer.PE
         public string PESource { get; set; }
         public bool IsProcess { get; private set;}
         public IntPtr ModuleBaseAddress { get; private set; }
+        public byte[] DataBytes { get; private set; }
 
         private int ProcessID;
         private string FilePath;
@@ -33,7 +34,8 @@ namespace PEViewer.PE
         //public MODULE_INFO ModuleInfo;
 
         public NET_STRUCTURES NetStructures;
-        
+
+        public bool IsNet { get { return (FileHeader.NumberOfSections > 0 && DataDirectories.CLRRuntimeHeaderRva != 0x0 && DataDirectories.SizeOfCLRRumtimeHeader != 0x0); } }
 
         public const int SizeOfDosHeader = 0x40;
         public const int SizeOfFileHeader = 0x18;
@@ -51,8 +53,9 @@ namespace PEViewer.PE
             Overview.SizeOfImage = OptionalHeader32.SizeOfImage;
         }
 
-        public PEInfomation(string path)
+        public PEInfomation(byte[] b, string path)
         {
+            DataBytes = b;
             FilePath = path;
             IsProcess = false;
         }
@@ -128,6 +131,41 @@ namespace PEViewer.PE
 
             if (FreeLibrary(loadedModuleHandle))
                 loadedModuleHandle = IntPtr.Zero;
+        }
+
+        public byte[] ReadStorageStream(STORAGE_STREAM_HEADER storageStream)
+        {
+            if (!IsNet)
+                return null;
+            try
+            {
+                byte[] stream = new byte[storageStream.iSize];
+
+                if (IsProcess)
+                {
+                    uint protection = 0;
+                    
+                    IntPtr handle = GetProcessHandle();
+                    IntPtr address = new IntPtr(ModuleBaseAddress.ToInt32() + NetStructures.COR20Header.MetaDataRva + storageStream.iOffset);
+
+                    PELoader.VirtualProtectEx(handle, address, stream.Length, 0x10, out protection);
+                    bool success = PELoader.ReadProcessMemory(handle, address, stream, stream.Length, 0);
+                    PELoader.VirtualProtectEx(handle, address, stream.Length, protection, out protection);
+
+                    CloseProcessHandle();
+                    if (!success)
+                        throw new Exception("Failed to read.");
+                }
+                else
+                {
+                    Buffer.BlockCopy(DataBytes, NetStructures.NetOffsets.MetaDataRawAddress + (int)storageStream.iOffset, stream, 0, stream.Length);
+                }
+                return stream;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
 

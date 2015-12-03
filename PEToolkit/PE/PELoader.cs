@@ -28,7 +28,7 @@ namespace PEViewer.PE
         {
             if (data == null) throw new ArgumentNullException("data");
 
-            PEInfomation info = new PEInfomation(path);
+            PEInfomation info = new PEInfomation(data, path);
 
             info.DosHeader = StructFromBytes<IMAGE_DOS_HEADER>(data, 0);
             info.FileHeader = StructFromBytes<IMAGE_FILE_HEADER>(data, Convert.ToInt32(info.DosHeader.e_lfanew));
@@ -44,45 +44,18 @@ namespace PEViewer.PE
                 info.Sections[i] = StructFromBytes<IMAGE_SECTION_HEADER>(data, sectionLocation);
             }
 
-            if (info.FileHeader.NumberOfSections > 0 && info.DataDirectories.CLRRuntimeHeaderRva != 0x0 && info.DataDirectories.SizeOfCLRRumtimeHeader != 0x0)
-            {
+            if (info.IsNet)
+            { 
                 //is .net
                 info.NetStructures.NetOffsets.COR20RawAddress = Convert.ToInt32(info.DataDirectories.CLRRuntimeHeaderRva - info.Sections[0].VirtualAddress + info.Sections[0].PointerToRawData);
                 info.NetStructures.COR20Header = StructFromBytes<COR20_HEADER>(data, info.NetStructures.NetOffsets.COR20RawAddress);
 
                 info.NetStructures.NetOffsets.MetaDataRawAddress = Convert.ToInt32(info.NetStructures.COR20Header.MetaDataRva - info.Sections[0].VirtualAddress + info.Sections[0].PointerToRawData);
 
-                info.NetStructures.MetaDataHeader.Signature = BitConverter.ToUInt32(data, info.NetStructures.NetOffsets.MetaDataRawAddress);
-                info.NetStructures.MetaDataHeader.MajorVersion = BitConverter.ToUInt16(data, info.NetStructures.NetOffsets.MetaDataRawAddress + 4);
-                info.NetStructures.MetaDataHeader.MinorVersion = BitConverter.ToUInt16(data, info.NetStructures.NetOffsets.MetaDataRawAddress + 6);
-                info.NetStructures.MetaDataHeader.Reserved = BitConverter.ToUInt32(data, info.NetStructures.NetOffsets.MetaDataRawAddress + 8);
-                info.NetStructures.MetaDataHeader.VersionLength = BitConverter.ToUInt32(data, info.NetStructures.NetOffsets.MetaDataRawAddress + 12);
+                LoadNetMetaData(info, data);
 
-                info.NetStructures.MetaDataHeader.VersionString = new char[info.NetStructures.MetaDataHeader.VersionLength];
-                info.NetStructures.MetaDataHeader.VersionString = Encoding.ASCII.GetString(data, info.NetStructures.NetOffsets.MetaDataRawAddress + 16, info.NetStructures.MetaDataHeader.VersionString.Length).ToCharArray();
-
-                info.NetStructures.MetaDataHeader.Flags = BitConverter.ToUInt16(data, info.NetStructures.NetOffsets.MetaDataRawAddress + 16 + Convert.ToInt32(info.NetStructures.MetaDataHeader.VersionLength));
-                info.NetStructures.MetaDataHeader.NumberOfStreams = BitConverter.ToUInt16(data, info.NetStructures.NetOffsets.MetaDataRawAddress + 18 + Convert.ToInt32(info.NetStructures.MetaDataHeader.VersionLength));
-
-                int metaDataHeaderSize = 20 + Convert.ToInt32(info.NetStructures.MetaDataHeader.VersionLength);
-                int offset = 0;
-
-                info.NetStructures.StorageStreamHeaders = new STORAGE_STREAM_HEADER[5];
-
-                int[] nameLengths = new int[] { 4, 12, 4, 8, 8};
-
-                for(int i = 0; i < nameLengths.Length; i++)
-                {
-                    info.NetStructures.StorageStreamHeaders[i].iOffset = BitConverter.ToUInt32(data, info.NetStructures.NetOffsets.MetaDataRawAddress + metaDataHeaderSize + offset);
-                    info.NetStructures.StorageStreamHeaders[i].iSize = BitConverter.ToUInt32(data, info.NetStructures.NetOffsets.MetaDataRawAddress + metaDataHeaderSize + 4 + offset);
-
-                    info.NetStructures.StorageStreamHeaders[i].rcName = new char[nameLengths[i]];
-                    info.NetStructures.StorageStreamHeaders[i].rcName = Encoding.ASCII.GetString(data, info.NetStructures.NetOffsets.MetaDataRawAddress + metaDataHeaderSize + 8 + offset, info.NetStructures.StorageStreamHeaders[i].rcName.Length).ToCharArray();
-                    offset += 8 + nameLengths[i];
-                }
-                info.NetStructures.SizeOfSotrageStreamHeaders = offset;
-
-                Debug.WriteLine((info.NetStructures.NetOffsets.MetaDataRawAddress + metaDataHeaderSize + offset + 0x6C).ToString("x2"));
+                
+                
             }
 
             info.WriteOverview();
@@ -130,13 +103,61 @@ namespace PEViewer.PE
                 info.Sections[i] = StructFromMemory<IMAGE_SECTION_HEADER>(handle, sectionLocation);
             }
 
+            if (info.IsNet)
+            {
+                //is .net
+                info.NetStructures.COR20Header = StructFromMemory<COR20_HEADER>(handle, new IntPtr((uint)baseAddress + info.DataDirectories.CLRRuntimeHeaderRva));
+
+                byte[] data = new byte[info.NetStructures.COR20Header.MetaDataSize];
+                ReadProcessMemory(handle, new IntPtr((uint)baseAddress + info.NetStructures.COR20Header.MetaDataRva), data, data.Length, 0);
+
+                LoadNetMetaData(info, data);
+
+            }
+
             info.CloseProcessHandle();
 
             info.WriteOverview();
             return info;
         }
 
-        
+        private static void LoadNetMetaData(PEInfomation info, byte[] MetaDataHeaderBytes)
+        {
+            info.NetStructures.MetaDataHeader.Signature = BitConverter.ToUInt32(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress);
+            info.NetStructures.MetaDataHeader.MajorVersion = BitConverter.ToUInt16(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + 4);
+            info.NetStructures.MetaDataHeader.MinorVersion = BitConverter.ToUInt16(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + 6);
+            info.NetStructures.MetaDataHeader.Reserved = BitConverter.ToUInt32(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + 8);
+            info.NetStructures.MetaDataHeader.VersionLength = BitConverter.ToUInt32(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + 12);
+
+            info.NetStructures.MetaDataHeader.VersionString = new char[info.NetStructures.MetaDataHeader.VersionLength];
+            info.NetStructures.MetaDataHeader.VersionString = Encoding.ASCII.GetString(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + 16, info.NetStructures.MetaDataHeader.VersionString.Length).ToCharArray();
+
+            info.NetStructures.MetaDataHeader.Flags = BitConverter.ToUInt16(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + 16 + Convert.ToInt32(info.NetStructures.MetaDataHeader.VersionLength));
+            info.NetStructures.MetaDataHeader.NumberOfStreams = BitConverter.ToUInt16(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + 18 + Convert.ToInt32(info.NetStructures.MetaDataHeader.VersionLength));
+
+
+            int metaDataHeaderSize = 20 + Convert.ToInt32(info.NetStructures.MetaDataHeader.VersionLength);
+            int offset = 0;
+
+            info.NetStructures.StorageStreamHeaders = new STORAGE_STREAM_HEADER[5];
+
+            int[] nameLengths = new int[] { 4, 12, 4, 8, 8 };
+
+            for (int i = 0; i < nameLengths.Length; i++)
+            {
+                info.NetStructures.StorageStreamHeaders[i].iOffset = BitConverter.ToUInt32(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + metaDataHeaderSize + offset);
+                info.NetStructures.StorageStreamHeaders[i].iSize = BitConverter.ToUInt32(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + metaDataHeaderSize + 4 + offset);
+
+                info.NetStructures.StorageStreamHeaders[i].rcName = new char[nameLengths[i]];
+                info.NetStructures.StorageStreamHeaders[i].rcName = Encoding.ASCII.GetString(MetaDataHeaderBytes, info.NetStructures.NetOffsets.MetaDataRawAddress + metaDataHeaderSize + 8 + offset, info.NetStructures.StorageStreamHeaders[i].rcName.Length).ToCharArray();
+                offset += 8 + nameLengths[i];
+            }
+            info.NetStructures.SizeOfSotrageStreamHeaders = offset;
+
+            info.NetStructures.NetOffsets.RawAddressOfTableStreams = info.NetStructures.NetOffsets.MetaDataRawAddress + Convert.ToInt32(info.NetStructures.StorageStreamHeaders[0].iOffset);
+            info.NetStructures.TableStreamHeader = StructFromBytes<TABLE_STREAM_HEADER>(MetaDataHeaderBytes, info.NetStructures.NetOffsets.RawAddressOfTableStreams);
+        }
+
         public static PEInfomation DisectSelf()
         {
             Process p = Process.GetCurrentProcess();
@@ -177,7 +198,10 @@ namespace PEViewer.PE
         private static extern IntPtr OpenProcess(uint access, bool inherit, int id);
         [DllImport("kernel32.dll")]
         private static extern bool CloseHandle(IntPtr handle);
-        [DllImport("kernel32.dll")]
-        private static extern bool ReadProcessMemory(IntPtr process, IntPtr baseAddress, byte[] buffer, int bufferSize, int bytesRead);
+        [DllImport("kernel32.dll", SetLastError=true)]
+        public static extern bool ReadProcessMemory(IntPtr process, IntPtr baseAddress, byte[] buffer, int bufferSize, int bytesRead);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool VirtualProtectEx(IntPtr process, IntPtr baseAddress, int size, uint newProtection, out uint oldProtection);
     }
 }

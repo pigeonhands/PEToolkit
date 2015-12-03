@@ -10,5 +10,6 @@ namespace PEToolkit.PE.Structures
     {
         public int COR20RawAddress;
         public int MetaDataRawAddress;
+        public int RawAddressOfTableStreams;
     }
 }

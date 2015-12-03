@@ -34,6 +34,11 @@ namespace PEViewer.Forms
 
         void PopulateInfo<Struct>(Struct sInfo, bool displayOffsets = true, bool useFileHeaderOffset = true, int uoffset = 0)
         {
+            if (LoadedPE == null)
+                return;
+
+            tsNetStructures.Visible = LoadedPE.IsNet;
+
             lvInfo.Items.Clear();
             this.Text = string.Format("{0} ({1})", LoadedWindowTest, LoadedPE.PESource);
             Type t = sInfo.GetType();
@@ -268,12 +273,20 @@ namespace PEViewer.Forms
 
         private void dataStreamsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (LoadedPE == null)
-                return;
-            using (formStorageStreamView sec = new formStorageStreamView(LoadedPE))
+            if (LoadedPE != null && LoadedPE.IsNet)
             {
-                sec.ShowDialog();
+                using (formStorageStreamView sec = new formStorageStreamView(LoadedPE))
+                {
+                    sec.ShowDialog();
+                }
             }
+        }
+
+        private void tableStreamHeaderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (LoadedPE == null) return;
+            lbCurrentSection.Text = "Table Stream Header";
+            PopulateInfo(LoadedPE.NetStructures.TableStreamHeader, true, false, LoadedPE.NetStructures.NetOffsets.RawAddressOfTableStreams);
         }
     }
 }

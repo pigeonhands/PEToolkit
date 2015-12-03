@@ -44,6 +44,10 @@
             this.imageHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionalPEHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dataDirectoriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsNetStructures = new System.Windows.Forms.ToolStripMenuItem();
+            this.cOR20ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.metaDataHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dataStreamsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.structuresToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resourcesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -63,10 +67,7 @@
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.nETToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cOR20ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.metaDataHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dataStreamsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tableStreamHeaderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cmOpen.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -147,7 +148,7 @@
             this.imageHeaderToolStripMenuItem,
             this.optionalPEHeaderToolStripMenuItem,
             this.dataDirectoriesToolStripMenuItem,
-            this.nETToolStripMenuItem,
+            this.tsNetStructures,
             this.structuresToolStripMenuItem,
             this.resourcesToolStripMenuItem});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
@@ -190,6 +191,39 @@
             this.dataDirectoriesToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
             this.dataDirectoriesToolStripMenuItem.Text = "Data Directories";
             this.dataDirectoriesToolStripMenuItem.Click += new System.EventHandler(this.dataDirectoriesToolStripMenuItem_Click);
+            // 
+            // tsNetStructures
+            // 
+            this.tsNetStructures.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cOR20ToolStripMenuItem,
+            this.metaDataHeaderToolStripMenuItem,
+            this.tableStreamHeaderToolStripMenuItem,
+            this.dataStreamsToolStripMenuItem});
+            this.tsNetStructures.Name = "tsNetStructures";
+            this.tsNetStructures.Size = new System.Drawing.Size(177, 22);
+            this.tsNetStructures.Text = ".NET";
+            this.tsNetStructures.Visible = false;
+            // 
+            // cOR20ToolStripMenuItem
+            // 
+            this.cOR20ToolStripMenuItem.Name = "cOR20ToolStripMenuItem";
+            this.cOR20ToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.cOR20ToolStripMenuItem.Text = "COR20";
+            this.cOR20ToolStripMenuItem.Click += new System.EventHandler(this.cOR20ToolStripMenuItem_Click);
+            // 
+            // metaDataHeaderToolStripMenuItem
+            // 
+            this.metaDataHeaderToolStripMenuItem.Name = "metaDataHeaderToolStripMenuItem";
+            this.metaDataHeaderToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.metaDataHeaderToolStripMenuItem.Text = "MetaData Header";
+            this.metaDataHeaderToolStripMenuItem.Click += new System.EventHandler(this.metaDataHeaderToolStripMenuItem_Click);
+            // 
+            // dataStreamsToolStripMenuItem
+            // 
+            this.dataStreamsToolStripMenuItem.Name = "dataStreamsToolStripMenuItem";
+            this.dataStreamsToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.dataStreamsToolStripMenuItem.Text = "Storage Streams";
+            this.dataStreamsToolStripMenuItem.Click += new System.EventHandler(this.dataStreamsToolStripMenuItem_Click);
             // 
             // structuresToolStripMenuItem
             // 
@@ -340,36 +374,12 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // nETToolStripMenuItem
+            // tableStreamHeaderToolStripMenuItem
             // 
-            this.nETToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cOR20ToolStripMenuItem,
-            this.metaDataHeaderToolStripMenuItem,
-            this.dataStreamsToolStripMenuItem});
-            this.nETToolStripMenuItem.Name = "nETToolStripMenuItem";
-            this.nETToolStripMenuItem.Size = new System.Drawing.Size(177, 22);
-            this.nETToolStripMenuItem.Text = ".NET";
-            // 
-            // cOR20ToolStripMenuItem
-            // 
-            this.cOR20ToolStripMenuItem.Name = "cOR20ToolStripMenuItem";
-            this.cOR20ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.cOR20ToolStripMenuItem.Text = "COR20";
-            this.cOR20ToolStripMenuItem.Click += new System.EventHandler(this.cOR20ToolStripMenuItem_Click);
-            // 
-            // metaDataHeaderToolStripMenuItem
-            // 
-            this.metaDataHeaderToolStripMenuItem.Name = "metaDataHeaderToolStripMenuItem";
-            this.metaDataHeaderToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
-            this.metaDataHeaderToolStripMenuItem.Text = "MetaData Header";
-            this.metaDataHeaderToolStripMenuItem.Click += new System.EventHandler(this.metaDataHeaderToolStripMenuItem_Click);
-            // 
-            // dataStreamsToolStripMenuItem
-            // 
-            this.dataStreamsToolStripMenuItem.Name = "dataStreamsToolStripMenuItem";
-            this.dataStreamsToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
-            this.dataStreamsToolStripMenuItem.Text = "Storage Streams";
-            this.dataStreamsToolStripMenuItem.Click += new System.EventHandler(this.dataStreamsToolStripMenuItem_Click);
+            this.tableStreamHeaderToolStripMenuItem.Name = "tableStreamHeaderToolStripMenuItem";
+            this.tableStreamHeaderToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.tableStreamHeaderToolStripMenuItem.Text = "Table Stream Header";
+            this.tableStreamHeaderToolStripMenuItem.Click += new System.EventHandler(this.tableStreamHeaderToolStripMenuItem_Click);
             // 
             // mainWindow
             // 
@@ -427,9 +437,10 @@
         private System.Windows.Forms.ToolStripMenuItem injectDllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resourcesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem unloadToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem nETToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tsNetStructures;
         private System.Windows.Forms.ToolStripMenuItem cOR20ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem metaDataHeaderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem dataStreamsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tableStreamHeaderToolStripMenuItem;
     }
 }
