@@ -20,16 +20,16 @@ namespace PEViewer.Forms
     public partial class mainWindow : Form
     {
         PEInfomation LoadedPE = null;
-        string LoadedWindowTest = string.Empty;
+        string LoadedWindowText = string.Empty;
         public mainWindow()
         {
             InitializeComponent();
-            LoadedWindowTest = this.Text;
+            LoadedWindowText = string.Format("PEToolkit - {0}", Application.ProductVersion);
         }
 
         private void mainWindow_Load(object sender, EventArgs e)
         {
-
+            this.Text = LoadedWindowText;
         }
 
         void PopulateInfo<Struct>(Struct sInfo, bool displayOffsets = true, bool useFileHeaderOffset = true, int uoffset = 0)
@@ -40,7 +40,7 @@ namespace PEViewer.Forms
             tsNetStructures.Visible = LoadedPE.IsNet;
 
             lvInfo.Items.Clear();
-            this.Text = string.Format("{0} ({1})", LoadedWindowTest, LoadedPE.PESource);
+            this.Text = string.Format("{0} ({1})", LoadedWindowText, LoadedPE.PESource);
             Type t = sInfo.GetType();
             int offset = useFileHeaderOffset ? Convert.ToInt32(LoadedPE.Overview.FileHeaderPointer) : uoffset;
 
