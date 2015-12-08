@@ -59,7 +59,7 @@ namespace PEViewer.Forms
                     else
                         i.SubItems.Add("");
                     i.SubItems.Add((value.Length * Marshal.SizeOf(typeof(char))).ToString());
-                    i.SubItems.Add("String");
+                    i.SubItems.Add(string.Format("Char[]"));
                     offset += value.Length;
                     lvInfo.Items.Add(i);
                     continue;
