@@ -49,7 +49,7 @@ namespace PEViewer.Forms
             int unmachedValues = 0;
 
             unmachedValues += ScanType<IMAGE_FILE_HEADER>(procPE.FileHeader, filePE.FileHeader, "File Header");
-            unmachedValues += ScanType<IMAGE_OPTIONAL_HEADER32>(procPE.OptionalHeader32, filePE.OptionalHeader32, "Optional Header");
+            unmachedValues += ScanType<IMAGE_OPTIONAL_HEADER32>(procPE.OptionalHeader32, filePE.OptionalHeader32, "Optional Header", "ImageBase");
             int sectionAmmount = Math.Min(Convert.ToInt32(procPE.Overview.NumberOfSections), Convert.ToInt32(filePE.Overview.NumberOfSections));
 
             for(int i = 0; i < sectionAmmount; i++)
@@ -60,30 +60,32 @@ namespace PEViewer.Forms
             Color tColor = Color.Green;
             string warningText = "No RunPE Found (0 Unmached values)";
 
-            if(unmachedValues == 1)
+            if(unmachedValues >= 1)
             {
                 tColor = Color.DarkTurquoise;
                 warningText = string.Format("Possable RunPe ({0} Unmaching values)", unmachedValues);
             }
 
-            if (unmachedValues > 1)
+            if (unmachedValues > 4)
             {
                 tColor = Color.Red;
-                warningText = string.Format("Possable RunPe ({0} Unmaching values)", unmachedValues);
+                warningText = string.Format("RunPe Found ({0} Unmaching values)", unmachedValues);
             }
 
             lbRunpeStatus.Text = warningText;
             lbRunpeStatus.ForeColor = tColor;
         }
 
-        int ScanType<T>(T procPE, T filePE, string str)
+        int ScanType<T>(T procPE, T filePE, string str, params string[] excludeFields)
         {
             Type scanType = typeof(T);
 
-            int TunmachedValues = 0;
+            int tUnmachedValues = 0;
 
             foreach (FieldInfo f in scanType.GetFields())
             {
+                if (excludeFields.Contains(f.Name))
+                    continue;
                 object oProc = f.GetValue(procPE);
                 object oFile = f.GetValue(filePE);
                 ListViewItem pI = new ListViewItem(f.Name);
@@ -99,14 +101,14 @@ namespace PEViewer.Forms
                 {
                     pI.ForeColor = Color.Red;
                     fI.ForeColor = Color.Red;
-                    TunmachedValues++;
+                    tUnmachedValues++;
                 }
                 
 
                 lbProcessList.Items.Add(pI);
                 lvFileList.Items.Add(fI);
             }
-            return TunmachedValues;
+            return tUnmachedValues;
         }
     }
 }
