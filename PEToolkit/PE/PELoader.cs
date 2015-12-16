@@ -1,4 +1,5 @@
-﻿using PEToolkit.PE.Structures.MetaData;
+﻿using PEToolkit.PE;
+using PEToolkit.PE.Structures.MetaData;
 using PEViewer.PE.Structures;
 using System;
 using System.Collections.Generic;
@@ -109,7 +110,7 @@ namespace PEViewer.PE
                 info.NetStructures.COR20Header = StructFromMemory<COR20_HEADER>(handle, new IntPtr((uint)baseAddress + info.DataDirectories.CLRRuntimeHeaderRva));
 
                 byte[] data = new byte[info.NetStructures.COR20Header.MetaDataSize];
-                ReadProcessMemory(handle, new IntPtr((uint)baseAddress + info.NetStructures.COR20Header.MetaDataRva), data, data.Length, 0);
+                NativeMethods.ReadProcessMemory(handle, new IntPtr((uint)baseAddress + info.NetStructures.COR20Header.MetaDataRva), data, data.Length, 0);
 
                 LoadNetMetaData(info, data);
 
@@ -166,20 +167,20 @@ namespace PEViewer.PE
 
         public static IntPtr OpenProcessHandle(int pid)
         {
-            return OpenProcess(0x1F0FFF, false, pid);
+            return NativeMethods.OpenProcess(0x1F0FFF, false, pid);
         }
 
         public static void CloseProcessHandle(IntPtr handle)
         {
             if (handle != IntPtr.Zero)
-                CloseHandle(handle);
+                NativeMethods.CloseHandle(handle);
         }
 
         public static T StructFromMemory<T>(IntPtr handle, IntPtr address)
         {
             int structSize = Marshal.SizeOf(typeof(T));
             byte[] buffer = new byte[structSize];
-            ReadProcessMemory(handle, address, buffer, buffer.Length, 0);
+            NativeMethods.ReadProcessMemory(handle, address, buffer, buffer.Length, 0);
             return StructFromBytes<T>(buffer, 0);
         }
 
@@ -192,16 +193,5 @@ namespace PEViewer.PE
             Marshal.FreeHGlobal(gAlloc);
             return retStruct;
         }
-
-
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr OpenProcess(uint access, bool inherit, int id);
-        [DllImport("kernel32.dll")]
-        private static extern bool CloseHandle(IntPtr handle);
-        [DllImport("kernel32.dll", SetLastError=true)]
-        public static extern bool ReadProcessMemory(IntPtr process, IntPtr baseAddress, byte[] buffer, int bufferSize, int bytesRead);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool VirtualProtectEx(IntPtr process, IntPtr baseAddress, int size, uint newProtection, out uint oldProtection);
     }
 }

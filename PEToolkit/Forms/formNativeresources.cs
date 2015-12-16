@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PEToolkit.PE;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,8 +16,7 @@ namespace PEViewer.Forms
 
     public partial class formNativeresources : Form
     {
-        private delegate bool EnumResourceNameCallback(IntPtr module, string type, string name, IntPtr z);
-        private delegate bool EnumResourceTypeCallback(IntPtr module, string type, IntPtr z);
+
 
         EnumResourceNameCallback ResourceNameCallback;
         EnumResourceTypeCallback ResourceTypeCallback;
@@ -29,7 +29,7 @@ namespace PEViewer.Forms
             ResourceNameCallback = new EnumResourceNameCallback(nameCallback);
             ResourceTypeCallback = new EnumResourceTypeCallback(typeCallback);
 
-            EnumResourceTypes(handle, ResourceTypeCallback, IntPtr.Zero);
+            NativeMethods.EnumResourceTypes(handle, ResourceTypeCallback, IntPtr.Zero);
            /*
             EnumResourceTypes(handle, "RT_RCDATA", "RT_STRING", "RT_VERSION", 
                 "RT_ICON", "RT_GROUP_ICON", "RT_BITMAP", "RT_MESSAGETABLE", 
@@ -43,13 +43,13 @@ namespace PEViewer.Forms
         {
             foreach(string s in types)
             {
-                EnumResourceNames(handle, s, ResourceNameCallback, IntPtr.Zero);
+                NativeMethods.EnumResourceNames(handle, s, ResourceNameCallback, IntPtr.Zero);
             }
         }
 
         bool typeCallback(IntPtr module, string type, IntPtr z)
         {
-            EnumResourceNames(module, type, ResourceNameCallback, IntPtr.Zero);
+            NativeMethods.EnumResourceNames(module, type, ResourceNameCallback, IntPtr.Zero);
             Debug.WriteLine("Type: " + type);
             return true;
         }
@@ -67,11 +67,7 @@ namespace PEViewer.Forms
 
         }
 
-        [DllImport("kernel32.dll")]
-        private static extern bool EnumResourceNames(IntPtr module, string rType, EnumResourceNameCallback cb, IntPtr z);
-
-        [DllImport("kernel32.dll")]
-        private static extern bool EnumResourceTypes(IntPtr module, EnumResourceTypeCallback cb, IntPtr z);
+        
 
         private void button1_Click(object sender, EventArgs e)
         {

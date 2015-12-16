@@ -1,4 +1,5 @@
 ﻿using PEToolkit.Controls;
+using PEToolkit.PE;
 using PEToolkit.PE.Structures;
 using PEViewer.Memory_Tools;
 using PEViewer.PE;
@@ -49,7 +50,7 @@ namespace PEToolkit.Forms
             }
 
             int size = 0;
-            if (!EnumProcessModulesEx(pHandle, null, 0, out size, 0x01))
+            if (!NativeMethods.EnumProcessModulesEx(pHandle, null, 0, out size, 0x01))
             {
                 MessageBox.Show("Failed to get module count");
                 this.DialogResult = DialogResult.OK;
@@ -62,7 +63,7 @@ namespace PEToolkit.Forms
             int ModuleCount = size / Marshal.SizeOf(typeof(IntPtr));
             IntPtr[] modules = new IntPtr[ModuleCount];
 
-            if (!EnumProcessModulesEx(pHandle, modules, size, out size, 0x01))
+            if (!NativeMethods.EnumProcessModulesEx(pHandle, modules, size, out size, 0x01))
             {
                 MessageBox.Show("Failed to get modules");
                 this.DialogResult = DialogResult.OK;
@@ -124,7 +125,7 @@ namespace PEToolkit.Forms
             byte[] buffer = new byte[procPE.Overview.SizeOfImage];
 
             IntPtr procHandle = procPE.GetProcessHandle();
-            ReadProcessMemory(procHandle, procPE.ModuleBaseAddress, buffer, Convert.ToInt32(procPE.Overview.SizeOfHeaders), 0);
+            NativeMethods.ReadProcessMemory(procHandle, procPE.ModuleBaseAddress, buffer, Convert.ToInt32(procPE.Overview.SizeOfHeaders), 0);
 
             foreach (IMAGE_SECTION_HEADER section in procPE.Sections)
             {
@@ -132,7 +133,7 @@ namespace PEToolkit.Forms
                     continue;
 
                 byte[] sData = new byte[section.SizeOfRawData];
-                ReadProcessMemory(procHandle, new IntPtr(procPE.Overview.ImageBase + section.VirtualAddress), sData, sData.Length, 0);
+                NativeMethods.ReadProcessMemory(procHandle, new IntPtr(procPE.Overview.ImageBase + section.VirtualAddress), sData, sData.Length, 0);
 
                 Buffer.BlockCopy(sData, 0, buffer, Convert.ToInt32(section.PointerToRawData), sData.Length);
             }
@@ -165,7 +166,7 @@ namespace PEToolkit.Forms
             uint currentAddress = 0;
 
             IntPtr hProc = PELoader.OpenProcessHandle(ProcessID);
-            while(VirtualQueryEx(hProc, currentAddress, out memInfo, mem_size) != 0)
+            while(NativeMethods.VirtualQueryEx(hProc, currentAddress, out memInfo, mem_size) != 0)
             {
                 if (FoundModules.Contains(memInfo.AllocationBase))
                 {
@@ -184,7 +185,7 @@ namespace PEToolkit.Forms
                 if (!FoundModules.Contains(memInfo.BaseAddress))
                 {
                     byte[] buffer = new byte[memInfo.RegionSize];
-                    ReadProcessMemory(hProc, memInfo.BaseAddress, buffer, buffer.Length, 0);
+                    NativeMethods.ReadProcessMemory(hProc, memInfo.BaseAddress, buffer, buffer.Length, 0);
                     for (int i = 0; i < buffer.Length - 1; i++)
                     {
                         if (buffer[i] == 'M' && buffer[i + 1] == 'Z')
@@ -213,12 +214,7 @@ namespace PEToolkit.Forms
             }
         }
 
-        [DllImport("psapi.dll")]
-        private static extern bool EnumProcessModulesEx(IntPtr hProc, IntPtr[] lphModule, int size, out int sizeNeeded, uint flags);
-        [DllImport("kernel32.dll")]
-        private static extern bool ReadProcessMemory(IntPtr handle, IntPtr address, byte[] buffer, int blen, int w0);
-        [DllImport("kernel32.dll")]
-        private static extern uint VirtualQueryEx(IntPtr handle, uint address, out MEMORY_BASIC_INFORMATION info, int size);
+       
 
         
     }

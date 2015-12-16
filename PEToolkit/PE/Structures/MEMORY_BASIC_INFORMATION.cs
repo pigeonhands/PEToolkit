@@ -10,7 +10,9 @@ namespace PEToolkit.PE.Structures
     [StructLayout(LayoutKind.Sequential)]
     public struct MEMORY_BASIC_INFORMATION
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible")]
         public IntPtr BaseAddress;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible")]
         public IntPtr AllocationBase;
         public uint AllocationProtect;
         public uint RegionSize;

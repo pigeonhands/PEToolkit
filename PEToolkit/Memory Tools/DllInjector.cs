@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PEToolkit.PE;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -43,7 +44,7 @@ namespace PEViewer.Memory_Tools
         public static bool Inject(int pID, string DllPath)
         {
             //Opens the target process with access to modify memory and create threads
-            IntPtr Handle = OpenProcess(0x8 | 0x2 | 0x400 | 0x10 | 0x20, false, pID);
+            IntPtr Handle = NativeMethods.OpenProcess(0x8 | 0x2 | 0x400 | 0x10 | 0x20, false, pID);
 
             if (Handle == IntPtr.Zero) throw new ArgumentException("Invalid process id or no permission", "pID");
             bool success;
@@ -60,7 +61,7 @@ namespace PEViewer.Memory_Tools
         /// <returns>Handle of injected dll</returns>
         public static IntPtr Inject(int pID, string DllPath, out bool success)
         {
-            IntPtr Handle = OpenProcess(0x8 | 0x2 | 0x400 | 0x10 | 0x20, false, pID);
+            IntPtr Handle = NativeMethods.OpenProcess(0x8 | 0x2 | 0x400 | 0x10 | 0x20, false, pID);
 
             if (Handle == IntPtr.Zero) throw new ArgumentException("Invalid process id or no permission", "pID");
             return Inject(Handle, DllPath, out success, true);
@@ -75,7 +76,7 @@ namespace PEViewer.Memory_Tools
         /// <returns>Handle of injected dll</returns>
         public static IntPtr Inject(int pID, string DllPath, out bool success, bool waitForHandle)
         {
-            IntPtr Handle = OpenProcess(0x8 | 0x2 | 0x400 | 0x10 | 0x20, false, pID);
+            IntPtr Handle = NativeMethods.OpenProcess(0x8 | 0x2 | 0x400 | 0x10 | 0x20, false, pID);
 
             if (Handle == IntPtr.Zero) throw new ArgumentException("Invalid process id or no permission", "pID");
             return Inject(Handle, DllPath, out success, waitForHandle);
@@ -98,45 +99,45 @@ namespace PEViewer.Memory_Tools
             string FullDllPath = Path.GetFullPath(DllPath);
 
             //Allocate ehough memory in the target process for the full dll path plus a "null Terminator" byte
-            IntPtr vAlloc = VirtualAllocEx(Handle, 0, FullDllPath.Length + 1, 0x1000, 0x40);
+            IntPtr vAlloc = NativeMethods.VirtualAllocEx(Handle, 0, (uint)FullDllPath.Length + 1, 0x1000, 0x40);
             if (vAlloc == IntPtr.Zero)
             {
                 //If the memory was not allocated, close the process handle and exit
-                CloseHandle(Handle);
+                NativeMethods.CloseHandle(Handle);
                 success = false;
                 return IntPtr.Zero;
             }
 
             //Write the path of the dll into the memory that was allocated
             //This is the same thing as setting a variable, except it is setting the value in the target process
-            if (WriteProcessMemory(Handle, vAlloc, FullDllPath, FullDllPath.Length, 0) == 0)
+            if (NativeMethods.WriteProcessMemory(Handle, vAlloc, FullDllPath, FullDllPath.Length, 0) == 0)
             {
                 //If the path was not written to the target process, close the process handle and exit
-                CloseHandle(Handle);
+                NativeMethods.CloseHandle(Handle);
                 success = false;
                 return IntPtr.Zero;
             }
 
             //Get the address of the kernel32 library
-            IntPtr hKernel32 = GetModuleHandle("kernel32.dll");
+            IntPtr hKernel32 = NativeMethods.GetModuleHandle("kernel32.dll");
 
             //Get the address of LoadLibraryA from inside the kernel32 library
             //https://msdn.microsoft.com/en-us/library/windows/desktop/ms684175(v=vs.85).aspx
             //LoadLibraryA - ANSI string as paramiter
             //LoadLibraryW - Unicode string as paramiter
             //LoadLibrary - Use default (Unicode), but not avalible through GetProcAddress
-            IntPtr hLoadLibrary = GetProcAddress(hKernel32, "LoadLibraryA");
+            IntPtr hLoadLibrary = NativeMethods.GetProcAddress(hKernel32, "LoadLibraryA");
 
             if (hLoadLibrary == IntPtr.Zero)
             {
                 //If We could not find the address of LoadLibraryA, close the process handle and exit
-                CloseHandle(Handle);
+                NativeMethods.CloseHandle(Handle);
                 success = false;
                 return IntPtr.Zero;
             }
 
             //Call "LoadLibraryA" with the full path of the dll as the paramiter in the target process in a new thread
-            IntPtr hThread = CreateRemoteThread(Handle, 0, 0, hLoadLibrary, vAlloc, 0, 0);
+            IntPtr hThread = NativeMethods.CreateRemoteThread(Handle, 0, 0, hLoadLibrary, vAlloc, 0, 0);
 
             //If thread was started successfully, injection was a success
             success = hThread != IntPtr.Zero;
@@ -146,15 +147,15 @@ namespace PEViewer.Memory_Tools
             {
                 //If injection was a success
                 //Wait for thread to exit
-                WaitForSingleObject(hThread, 0xFFFFFFFF);
+                NativeMethods.WaitForSingleObject(hThread, 0xFFFFFFFF);
 
                 //get the thread exit code
                 //In this case, it will be the return value of LoadLibrary or 259 if its still running
-                GetExitCodeThread(hThread, ref dllHandle);
+                NativeMethods.GetExitCodeThread(hThread, ref dllHandle);
             }
 
             //Close the process handle
-            CloseHandle(Handle);
+            NativeMethods.CloseHandle(Handle);
 
             //Return the handle of the created thread
             return dllHandle;
@@ -163,42 +164,12 @@ namespace PEViewer.Memory_Tools
         public static void UnloadDll(IntPtr handle, IntPtr module)
         {
             if (handle == IntPtr.Zero) throw new ArgumentNullException("Handle");
-            IntPtr hKernel32 = GetModuleHandle("kernel32.dll");
-            IntPtr hLoadLibrary = GetProcAddress(hKernel32, "FreeLibrary");
+            IntPtr hKernel32 = NativeMethods.GetModuleHandle("kernel32.dll");
+            IntPtr hLoadLibrary = NativeMethods.GetProcAddress(hKernel32, "FreeLibrary");
 
             if (hLoadLibrary == IntPtr.Zero)
                 return;
-            IntPtr hThread = CreateRemoteThread(handle, 0, 0, hLoadLibrary, module, 0, 0);
+            IntPtr hThread = NativeMethods.CreateRemoteThread(handle, 0, 0, hLoadLibrary, module, 0, 0);
         }
-
-        #region " WinApi "
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr VirtualAllocEx(IntPtr hProcess, int lpAddress, int dwSize, uint flAllocationType, uint flProtect);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, int dwProcessId);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool CloseHandle(IntPtr handle);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern int WriteProcessMemory(IntPtr handle, IntPtr address, string buffer, int blength, int readwrite);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr GetModuleHandle(string name);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr GetProcAddress(IntPtr mHandle, string fname);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr CreateRemoteThread(IntPtr pHandle, int att_0, int stacksize_0, IntPtr callingFunction, IntPtr paramiters, uint createFlags_0, int tID);
-
-        [DllImport("kernel32.dll")]
-        private static extern bool GetExitCodeThread(IntPtr handle, ref IntPtr retBuffer);
-        [DllImport("kernel32")]
-        private static extern int WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
-
-        #endregion
     }
 }

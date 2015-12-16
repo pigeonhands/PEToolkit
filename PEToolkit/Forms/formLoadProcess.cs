@@ -77,8 +77,5 @@ namespace PEViewer.Forms
             }
             this.DialogResult = DialogResult.OK;
         }
-
-        [DllImport("kernel32.dll")]
-        private static extern bool IsWow64Process(IntPtr handle, ref bool is64);
     }
 }

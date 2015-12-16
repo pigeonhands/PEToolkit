@@ -71,9 +71,5 @@ namespace PEToolkit.Forms
                 vs.ShowDialog();
             }
         }
-
-
-        [DllImport("kernel32.dll")]
-        private static extern bool ReadProcessMemory(IntPtr process, IntPtr baseAddress, byte[] buffer, int bufferSize, int bytesRead);
     }
 }

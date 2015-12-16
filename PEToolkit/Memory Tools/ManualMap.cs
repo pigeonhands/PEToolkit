@@ -1,4 +1,5 @@
-﻿using PEViewer.PE;
+﻿using PEToolkit.PE;
+using PEViewer.PE;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,32 +19,22 @@ namespace PEToolkit.Memory_Tools
             if (pHandle == IntPtr.Zero)
                 throw new Exception("Invalid PID");
 
-            IntPtr vAlloc = VirtualAllocEx(pHandle, 0, dllPE.Overview.SizeOfImage, 0x1000, 0x40);
+            IntPtr vAlloc = NativeMethods.VirtualAllocEx(pHandle, 0, dllPE.Overview.SizeOfImage, 0x1000, 0x40);
 
             if (vAlloc == IntPtr.Zero)
                 throw new Exception("Alloc failed");
 
-            WriteProcessMemory(pHandle, vAlloc, dllBytes, dllPE.Overview.SizeOfHeaders, 0);
+            NativeMethods.WriteProcessMemory(pHandle, vAlloc, dllBytes, dllPE.Overview.SizeOfHeaders, 0);
 
             foreach(var section in dllPE.Sections)
             {
                 byte[] sData = new byte[section.VirtualSize];
                 Buffer.BlockCopy(dllBytes, (int)section.PointerToRawData, sData, 0, sData.Length);
 
-                WriteProcessMemory(pHandle,  new IntPtr(vAlloc.ToInt32() + section.VirtualAddress), sData, (uint)sData.Length, 0);
+                NativeMethods.WriteProcessMemory(pHandle,  new IntPtr(vAlloc.ToInt32() + section.VirtualAddress), sData, (uint)sData.Length, 0);
             }
 
             
         }
-
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr VirtualAllocEx(IntPtr hProcess, int lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern int WriteProcessMemory(IntPtr handle, IntPtr address, byte[] buffer, uint blength, int readwrite);
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr GetProcAddress(IntPtr mHandle, string fname);
-
     }
 }

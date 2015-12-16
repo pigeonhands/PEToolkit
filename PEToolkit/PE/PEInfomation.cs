@@ -1,4 +1,5 @@
-﻿using PEToolkit.PE.Structures;
+﻿using PEToolkit.PE;
+using PEToolkit.PE.Structures;
 using PEToolkit.PE.Structures.MetaData;
 using PEViewer.PE.Structures;
 using System;
@@ -78,7 +79,7 @@ namespace PEViewer.PE
         void LoadModuleInfo()
         {
             StringBuilder sb = new StringBuilder(255);
-            GetModuleFileNameEx(GetProcessHandle(), ModuleBaseAddress, sb, 255);
+            NativeMethods.GetModuleFileNameEx(GetProcessHandle(), ModuleBaseAddress, sb, 255);
             FilePath = sb.ToString();
 
             /*
@@ -97,7 +98,7 @@ namespace PEViewer.PE
             if (Handle != IntPtr.Zero)
                 return Handle;
             if (IsProcess)
-                Handle = OpenProcess(0x1F0FFF, false, ProcessID);
+                Handle = NativeMethods.OpenProcess(0x1F0FFF, false, ProcessID);
             return Handle;
         }
 
@@ -108,7 +109,7 @@ namespace PEViewer.PE
 
             if (IsProcess)
             {
-                if (CloseHandle(Handle))
+                if (NativeMethods.CloseHandle(Handle))
                     Handle = IntPtr.Zero;
             }
         }
@@ -118,7 +119,7 @@ namespace PEViewer.PE
             if (loadedModuleHandle != IntPtr.Zero)
                 return loadedModuleHandle;
 
-            loadedModuleHandle = LoadLibrary(FilePath);
+            loadedModuleHandle = NativeMethods.LoadLibrary(FilePath);
 
 
             return loadedModuleHandle;
@@ -129,7 +130,7 @@ namespace PEViewer.PE
             if (loadedModuleHandle == IntPtr.Zero)
                 return;
 
-            if (FreeLibrary(loadedModuleHandle))
+            if (NativeMethods.FreeLibrary(loadedModuleHandle))
                 loadedModuleHandle = IntPtr.Zero;
         }
 
@@ -148,9 +149,9 @@ namespace PEViewer.PE
                     IntPtr handle = GetProcessHandle();
                     IntPtr address = new IntPtr(ModuleBaseAddress.ToInt32() + NetStructures.COR20Header.MetaDataRva + storageStream.iOffset);
 
-                    PELoader.VirtualProtectEx(handle, address, stream.Length, 0x10, out protection);
-                    bool success = PELoader.ReadProcessMemory(handle, address, stream, stream.Length, 0);
-                    PELoader.VirtualProtectEx(handle, address, stream.Length, protection, out protection);
+                    NativeMethods.VirtualProtectEx(handle, address, stream.Length, 0x10, out protection);
+                    bool success = NativeMethods.ReadProcessMemory(handle, address, stream, stream.Length, 0);
+                    NativeMethods.VirtualProtectEx(handle, address, stream.Length, protection, out protection);
 
                     CloseProcessHandle();
                     if (!success)
@@ -170,19 +171,6 @@ namespace PEViewer.PE
 
 
 
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
-        [DllImport("kernel32.dll")]
-        private static extern bool CloseHandle(IntPtr handle);
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr LoadLibrary(string path);
-        [DllImport("kernel32.dll")]
-        private static extern bool FreeLibrary(IntPtr handle);
-        [DllImport("psapi.dll")]
-        private static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, StringBuilder lpBaseName, int nSize);
-        [DllImport("psapi.dll", SetLastError =true)]
-        private static extern bool GetModuleInformation(IntPtr handle, IntPtr module, out MODULE_INFO inf, int cb);
-        [DllImport("kernel32.dll")]
-        private static extern bool GetModuleHandleEx(uint flags, StringBuilder address, out IntPtr handle);
+        
     }
 }

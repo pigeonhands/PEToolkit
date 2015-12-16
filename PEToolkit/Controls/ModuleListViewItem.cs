@@ -1,4 +1,5 @@
-﻿using PEViewer.PE;
+﻿using PEToolkit.PE;
+using PEViewer.PE;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,7 +26,7 @@ namespace PEToolkit.Controls
 
             StringBuilder sb = new StringBuilder(255);
 
-            GetModuleFileNameEx(ProcessHandle, Handle, sb, 255);
+            NativeMethods.GetModuleFileNameEx(ProcessHandle, Handle, sb, 255);
             ModulePath = sb.ToString();
 
             Text = Path.GetFileName(ModulePath);
@@ -36,8 +37,5 @@ namespace PEToolkit.Controls
             else
                 SubItems.Add("Byte loaded");
         }
-
-        [DllImport("psapi.dll")]
-        static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, StringBuilder lpBaseName, int nSize);
     }
 }

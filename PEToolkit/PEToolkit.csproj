@@ -128,9 +128,9 @@
     <Compile Include="Forms\mainWindow.Designer.cs">
       <DependentUpon>mainWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Memory Tools\AntiDump.cs" />
     <Compile Include="Memory Tools\DllInjector.cs" />
     <Compile Include="Memory Tools\ManualMap.cs" />
+    <Compile Include="PE\NativeMethods.cs" />
     <Compile Include="PE\PEInfomation.cs" />
     <Compile Include="PE\PELoader.cs" />
     <Compile Include="PE\Structures\IMAGE_DATA_DIRECTORIES.cs" />

@@ -10,8 +10,10 @@ namespace PEToolkit.PE.Structures
     [StructLayout(LayoutKind.Sequential)]
     public struct MODULE_INFO
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible")]
         public IntPtr lpBaseOfDll;
         public uint SizeOfImage;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2111:PointersShouldNotBeVisible")]
         public IntPtr EntryPoint;
     }
 }
